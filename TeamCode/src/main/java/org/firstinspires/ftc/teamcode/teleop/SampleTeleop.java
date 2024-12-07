@@ -111,5 +111,7 @@ public class SampleTeleop extends LinearOpMode {
 
     private void gamepad2Controls() {
         // Nothing to do here
+        if (gamepad2.circle){
+        }
     }
 }
