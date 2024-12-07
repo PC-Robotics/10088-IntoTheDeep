@@ -77,22 +77,22 @@ public class SampleTeleop extends LinearOpMode {
         }
 
         // 90 degree rotations from starting orientation
-        if(gamepad1.y)
+        if(gamepad1.triangle)
         {
             robot.yawController.reset(0);
             autoHeading = true;
         }
-        else if(gamepad1.x)
+        else if(gamepad1.square)
         {
             robot.yawController.reset(Math.PI/2);
             autoHeading = true;
         }
-        else if(gamepad1.a)
+        else if(gamepad1.cross)
         {
             robot.yawController.reset(Math.PI);
             autoHeading = true;
         }
-        else if(gamepad1.b)
+        else if(gamepad1.circle)
         {
             robot.yawController.reset(-Math.PI / 2);
             autoHeading = true;
