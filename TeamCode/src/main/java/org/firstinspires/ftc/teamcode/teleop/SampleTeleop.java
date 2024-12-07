@@ -109,8 +109,7 @@ public class SampleTeleop extends LinearOpMode {
         robot.moveRobot(x,y,turn,1);
     }
 
-    public void gamepad2Controls()
-    {
+    private void gamepad2Controls() {
         // Nothing to do here
     }
 }
