@@ -3,8 +3,12 @@ package org.firstinspires.ftc.teamcode.teleop;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.support.PIDRobot;
+import org.firstinspires.ftc.teamcode.support.Robot;
+
+@TeleOp(name="SampleTeleop", group=" Sample")
 
 public class SampleTeleop extends LinearOpMode {
 
@@ -13,7 +17,7 @@ public class SampleTeleop extends LinearOpMode {
     // Used to keep the robot facing the same direction if bumped
     boolean autoHeading = false;
 
-    PIDRobot robot = new PIDRobot(this,false);
+    PIDRobot robot = new Robot(this);
 
     @Override
     public void runOpMode() throws InterruptedException

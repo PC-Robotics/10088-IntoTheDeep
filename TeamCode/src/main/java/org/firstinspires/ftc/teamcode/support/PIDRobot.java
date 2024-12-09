@@ -105,8 +105,8 @@ public class PIDRobot
         imu = myOpMode.hardwareMap.get(IMU.class,"imu");
 
         // Initialize the odometry wheels
-        driveEncoder = myOpMode.hardwareMap.get(DcMotor.class,"axial");
-        strafeEncoder = myOpMode.hardwareMap.get(DcMotor.class,"intake");
+        //driveEncoder = myOpMode.hardwareMap.get(DcMotor.class,"axial");
+        //strafeEncoder = myOpMode.hardwareMap.get(DcMotor.class,"intake");
 
         /*
          * Copied from another source (Simpflied Odometry by gearsincorg)
@@ -161,8 +161,10 @@ public class PIDRobot
      * always return true so this can be used in "while" loop conditions
      * @return true
      */
+
     public boolean readSensors()
     {
+        /*
         rawDriveOdometer = driveEncoder.getCurrentPosition() * (INVERT_DRIVE_ODOMETRY ? -1 : 1);
         rawStrafeOdometer = strafeEncoder.getCurrentPosition() * (INVERT_STRAFE_ODOMETRY ? -1 : 1);
         driveDistance = (rawDriveOdometer - driveOdometerOffset) * ODOM_INCHES_PER_COUNT;
@@ -179,9 +181,10 @@ public class PIDRobot
         myOpMode.telemetry.addData("Strafe Distance :: ",strafeDistance);
         myOpMode.telemetry.addData("Heading :: ",heading);
         myOpMode.telemetry.addData("Turn Rate :: ",turnRate);
-
+        */
         return true;  // do this so this function can be included in the condition for a while loop to keep values fresh.
     }
+
 
     //  ########################  Mid level control functions.  #############################3#
 
