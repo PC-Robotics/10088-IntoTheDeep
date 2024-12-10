@@ -7,15 +7,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 public class Robot extends PIDRobot
 {
+    public Robot(LinearOpMode opMode) {super(opMode, false);}
+
     public Servo wristPitch = null;
     public Servo wristYaw = null;
     public Servo claw = null;
     public DcMotor linearSlide = null;
     public DcMotor arm = null;
-    public DcMotor climbL = null;
-    public DcMotor climbR = null;
-
-    public Robot(LinearOpMode opMode) {super(opMode, false);}
+    public DcMotor climbLeft = null;
+    public DcMotor climbRight = null;
 
     public void init() {
         // define and init servos
@@ -41,17 +41,17 @@ public class Robot extends PIDRobot
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        climbL = myOpMode.hardwareMap.get(DcMotor.class, "climbL");
-        climbL.setDirection(DcMotor.Direction.REVERSE);
-        climbL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        climbL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        climbL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        climbLeft = myOpMode.hardwareMap.get(DcMotor.class, "climbL");
+        climbLeft.setDirection(DcMotor.Direction.REVERSE);
+        climbLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        climbLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        climbLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        climbR = myOpMode.hardwareMap.get(DcMotor.class, "climbR");
-        climbR.setDirection(DcMotor.Direction.FORWARD);
-        climbR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        climbR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        climbR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        climbRight = myOpMode.hardwareMap.get(DcMotor.class, "climbR");
+        climbRight.setDirection(DcMotor.Direction.FORWARD);
+        climbRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        climbRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        climbRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         myOpMode.telemetry.addData(">", "Hardware Initialized");
 

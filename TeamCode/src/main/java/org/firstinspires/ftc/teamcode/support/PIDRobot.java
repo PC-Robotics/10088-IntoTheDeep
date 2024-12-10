@@ -47,31 +47,20 @@ public class PIDRobot
     private DcMotor frontLeft  = null;
     private DcMotor backRight = null;
     private DcMotor backLeft = null;
-    private DcMotor driveEncoder = null;
-    private DcMotor strafeEncoder = null;
 
     private IMU imu = null;
 
     private ElapsedTime holdTimer = new ElapsedTime();
 
     // Public Members
-    public double driveDistance     = 0; // scaled axial distance (+ = forward)
-    public double strafeDistance    = 0; // scaled lateral distance (+ = left)
-    public double heading           = 0; // Latest Robot heading from IMU
-
-    private int rawDriveOdometer    = 0; // Unmodified axial odometer count
-    private int driveOdometerOffset = 0; // Used to offset axial odometer
-    private int rawStrafeOdometer   = 0; // Unmodified lateral odometer count
-    private int strafeOdometerOffset= 0; // Used to offset lateral odometer
-    private double rawHeading       = 0; // Unmodified heading (degrees)
-    private double headingOffset    = 0; // Used to offset heading
+    public double heading = 0; // Latest Robot heading from IMU
 
     public PIDController driveController = new PIDController(DRIVE_KP,DRIVE_KI,DRIVE_KD,DRIVE_ACCEL,DRIVE_MAX_AUTO,DRIVE_TOLERANCE,DRIVE_DEADBAND,false);
     public PIDController strafeController = new PIDController(STRAFE_KP,STRAFE_KI,STRAFE_KD,STRAFE_ACCEL,STRAFE_MAX_AUTO,STRAFE_TOLERANCE,STRAFE_DEADBAND,false);
     public PIDController yawController = new PIDController(YAW_KP,YAW_KI,YAW_KD,YAW_ACCEL,YAW_MAX_AUTO,YAW_TOLERANCE,YAW_DEADBAND,true);
 
     private double turnRate         = 0; // Latest Robot Turn Rate from IMU
-    private boolean showTelemetry   = false;
+    private boolean showTelemetry   = true;
 
     private int fieldCentric        = 0;
 
@@ -104,10 +93,6 @@ public class PIDRobot
         // Initialize the IMU
         imu = myOpMode.hardwareMap.get(IMU.class,"imu");
 
-        // Initialize the odometry wheels
-        //driveEncoder = myOpMode.hardwareMap.get(DcMotor.class,"axial");
-        //strafeEncoder = myOpMode.hardwareMap.get(DcMotor.class,"intake");
-
         /*
          * Copied from another source (Simpflied Odometry by gearsincorg)
          * Claims that this code makes the encoder readouts faster
@@ -125,11 +110,6 @@ public class PIDRobot
                 new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
                         RevHubOrientationOnRobot.UsbFacingDirection.LEFT);
         imu.initialize(new IMU.Parameters(orientationOnRobot));
-
-        // Zero out all odometry
-        resetOdometry();
-
-
     }
 
     /**
@@ -164,6 +144,8 @@ public class PIDRobot
 
     public boolean readSensors()
     {
+        heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        myOpMode.telemetry.addData("Heading :: ",heading);
         /*
         rawDriveOdometer = driveEncoder.getCurrentPosition() * (INVERT_DRIVE_ODOMETRY ? -1 : 1);
         rawStrafeOdometer = strafeEncoder.getCurrentPosition() * (INVERT_STRAFE_ODOMETRY ? -1 : 1);
@@ -194,31 +176,31 @@ public class PIDRobot
      * @param power Maximum power to apply.  This number should always be positive.
      * @param holdTime Minimum time (sec) required to hold the final position.  0 = no hold.
      */
-    public void drive(double distanceInches, double power, double holdTime) {
-        resetOdometry();
-
-        driveController.reset(distanceInches, power);   // achieve desired drive distance
-        strafeController.reset(0);              // Maintain zero strafe drift
-        yawController.reset();                          // Maintain last turn heading
-        holdTimer.reset();
-
-        while (myOpMode.opModeIsActive() && readSensors()){
-
-            // implement desired axis powers
-            moveRobot(-strafeController.getOutput(strafeDistance), -driveController.getOutput(driveDistance),yawController.getOutput(heading),power);
-
-            // Time to exit?
-            if (driveController.inPosition() && yawController.inPosition()) {
-                if (holdTimer.time() > holdTime) {
-                    break;   // Exit loop if we are in position, and have been there long enough.
-                }
-            } else {
-                holdTimer.reset();
-            }
-            myOpMode.sleep(10);
-        }
-        stopRobot();
-    }
+//    public void drive(double distanceInches, double power, double holdTime) {
+//        resetOdometry();
+//
+//        driveController.reset(distanceInches, power);   // achieve desired drive distance
+//        strafeController.reset(0);              // Maintain zero strafe drift
+//        yawController.reset();                          // Maintain last turn heading
+//        holdTimer.reset();
+//
+//        while (myOpMode.opModeIsActive() && readSensors()){
+//
+//            // implement desired axis powers
+//            moveRobot(-strafeController.getOutput(strafeDistance), -driveController.getOutput(driveDistance),yawController.getOutput(heading),power);
+//
+//            // Time to exit?
+//            if (driveController.inPosition() && yawController.inPosition()) {
+//                if (holdTimer.time() > holdTime) {
+//                    break;   // Exit loop if we are in position, and have been there long enough.
+//                }
+//            } else {
+//                holdTimer.reset();
+//            }
+//            myOpMode.sleep(10);
+//        }
+//        stopRobot();
+//    }
 
     /**
      * Strafe in the lateral (left/right) direction, maintain the current heading and don't drift fwd/bwd
@@ -226,59 +208,59 @@ public class PIDRobot
      * @param power Maximum power to apply.  This number should always be positive.
      * @param holdTime Minimum time (sec) required to hold the final position.  0 = no hold.
      */
-    public void strafe(double distanceInches, double power, double holdTime) {
-        resetOdometry();
-
-        driveController.reset(0.0);             //  Maintain zero drive drift
-        strafeController.reset(distanceInches, power);  // Achieve desired Strafe distance
-        yawController.reset();                          // Maintain last turn angle
-        holdTimer.reset();
-
-        while (myOpMode.opModeIsActive() && readSensors()){
-
-            // implement desired axis powers
-            moveRobot(-strafeController.getOutput(strafeDistance), -driveController.getOutput(driveDistance),yawController.getOutput(heading),power);
-
-            // Time to exit?
-            if (strafeController.inPosition() && yawController.inPosition()) {
-                if (holdTimer.time() > holdTime) {
-                    break;   // Exit loop if we are in position, and have been there long enough.
-                }
-            } else {
-                holdTimer.reset();
-            }
-            myOpMode.sleep(10);
-        }
-        stopRobot();
-    }
-
-    /**
-     * Rotate to an absolute heading/direction.
-     * Note: this is relative to the robot start location unless resetHeading() is used
-     * @param headingRad  Heading to obtain.  +ve = CCW, -ve = CW.
-     * @param power Maximum power to apply.  This number should always be positive.
-     * @param holdTime Minimum time (sec) required to hold the final position.  0 = no hold.
-     */
-    public void turnTo(double headingRad, double power, double holdTime) {
-
-        yawController.reset(headingRad, power);
-        while (myOpMode.opModeIsActive() && readSensors()) {
-
-            // implement desired axis powers
-            moveRobot(0, 0, yawController.getOutput(heading),power);
-
-            // Time to exit?
-            if (yawController.inPosition()) {
-                if (holdTimer.time() > holdTime) {
-                    break;   // Exit loop if we are in position, and have been there long enough.
-                }
-            } else {
-                holdTimer.reset();
-            }
-            myOpMode.sleep(10);
-        }
-        stopRobot();
-    }
+//    public void strafe(double distanceInches, double power, double holdTime) {
+//        resetOdometry();
+//
+//        driveController.reset(0.0);             //  Maintain zero drive drift
+//        strafeController.reset(distanceInches, power);  // Achieve desired Strafe distance
+//        yawController.reset();                          // Maintain last turn angle
+//        holdTimer.reset();
+//
+//        while (myOpMode.opModeIsActive() && readSensors()){
+//
+//            // implement desired axis powers
+//            moveRobot(-strafeController.getOutput(strafeDistance), -driveController.getOutput(driveDistance),yawController.getOutput(heading),power);
+//
+//            // Time to exit?
+//            if (strafeController.inPosition() && yawController.inPosition()) {
+//                if (holdTimer.time() > holdTime) {
+//                    break;   // Exit loop if we are in position, and have been there long enough.
+//                }
+//            } else {
+//                holdTimer.reset();
+//            }
+//            myOpMode.sleep(10);
+//        }
+//        stopRobot();
+//    }
+//
+//    /**
+//     * Rotate to an absolute heading/direction.
+//     * Note: this is relative to the robot start location unless resetHeading() is used
+//     * @param headingRad  Heading to obtain.  +ve = CCW, -ve = CW.
+//     * @param power Maximum power to apply.  This number should always be positive.
+//     * @param holdTime Minimum time (sec) required to hold the final position.  0 = no hold.
+//     */
+//    public void turnTo(double headingRad, double power, double holdTime) {
+//
+//        yawController.reset(headingRad, power);
+//        while (myOpMode.opModeIsActive() && readSensors()) {
+//
+//            // implement desired axis powers
+//            moveRobot(0, 0, yawController.getOutput(heading),power);
+//
+//            // Time to exit?
+//            if (yawController.inPosition()) {
+//                if (holdTimer.time() > holdTime) {
+//                    break;   // Exit loop if we are in position, and have been there long enough.
+//                }
+//            } else {
+//                holdTimer.reset();
+//            }
+//            myOpMode.sleep(10);
+//        }
+//        stopRobot();
+//    }
 
 
     //  ########################  Low level control functions.  ###############################
@@ -289,7 +271,7 @@ public class PIDRobot
      * @param y     gamepad1 leftStick  y
      * @param turn  gamepad1 rightStick x
      */
-    public void moveRobot(double x, double y, double turn,double maxPower)
+    public void moveRobot(double x, double y, double turn, double maxPower)
     {
         double theta;
         double power;
@@ -305,7 +287,7 @@ public class PIDRobot
         // If fieldCentric controls, adjust the angle based on the robot's orientation
         // Otherwise, fieldCentric = 0 and the angle is based only on the input
         // theta is the angle the left stick is pressed / you want the robot to move
-        theta = Math.atan2(y, x) + fieldCentric * rawHeading;
+        theta = Math.atan2(y, x) + fieldCentric * heading;
         power = Math.hypot(x, y);
 
         // Values are offset by PI / 4 because of mecanum wheels
@@ -352,28 +334,26 @@ public class PIDRobot
         moveRobot(0,0,0,1);
     }
 
-    /**
-     * Set odometry counts and distances to zero.
-     */
-    public void resetOdometry() {
-        readSensors();
-        driveOdometerOffset = rawDriveOdometer;
-        driveDistance = 0.0;
-        driveController.reset(0);
-
-        strafeOdometerOffset = rawStrafeOdometer;
-        strafeDistance = 0.0;
-        strafeController.reset(0);
-    }
+//    /**
+//     * Set odometry counts and distances to zero.
+//     */
+//    public void resetOdometry() {
+//        readSensors();
+//        driveOdometerOffset = rawDriveOdometer;
+//        driveDistance = 0.0;
+//        driveController.reset(0);
+//
+//        strafeOdometerOffset = rawStrafeOdometer;
+//        strafeDistance = 0.0;
+//        strafeController.reset(0);
+//    }
 
     /**
      * Reset the robot heading to zero degrees, and also lock that heading into heading controller.
      * Useful when giving new commands based on robot's current positioning instead of where it started
      */
     public void resetHeading() {
-        readSensors();
-        headingOffset = rawHeading;
-        yawController.reset(0);
+        imu.resetYaw();
         heading = 0;
     }
 
