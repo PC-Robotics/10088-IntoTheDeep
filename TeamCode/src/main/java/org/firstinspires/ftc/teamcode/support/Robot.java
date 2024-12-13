@@ -5,19 +5,20 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-public class Robot extends PIDRobot
-{
-    public Servo wristPitch = null;
-    public Servo wristYaw = null;
-    public Servo claw = null;
-    public DcMotor linearSlide = null;
-    public DcMotor arm = null;
-    public DcMotor climbL = null;
-    public DcMotor climbR = null;
+public class Robot extends PIDRobot {
+    private Servo wristPitch = null;
+    private Servo wristYaw = null;
+    private Servo claw = null;
+    private DcMotor linearSlide = null;
+    private DcMotor arm = null;
+    private DcMotor climbL = null;
+    private DcMotor climbR = null;
 
-    public Robot(LinearOpMode opMode) {super(opMode, false);}
+    public Robot(LinearOpMode opMode) {
+        super(opMode, false);
+    }
 
-    public void init() {
+    public void init(boolean showTelemetry) {
         // define and init servos
         wristPitch = myOpMode.hardwareMap.get(Servo.class, "wristPitch");
         wristPitch.setDirection(Servo.Direction.FORWARD);
@@ -56,5 +57,25 @@ public class Robot extends PIDRobot
         myOpMode.telemetry.addData(">", "Hardware Initialized");
 
         super.init(true);
+    }
+
+    public void clawOpen(boolean open) {
+        if (open) {
+            claw.setPosition(0.5);
+        } else {
+            claw.setPosition(0);
+        }
+    }
+
+    public void lowerWrist(boolean down) {
+        if (down) {
+            wristPitch.setPosition(0.125);
+        } else {
+            wristPitch.setPosition(0.625);
+        }
+    }
+
+    public void moveLinearSlide(boolean isForwards) {
+
     }
 }

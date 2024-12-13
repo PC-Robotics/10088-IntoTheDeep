@@ -105,8 +105,8 @@ public class PIDRobot
         imu = myOpMode.hardwareMap.get(IMU.class,"imu");
 
         // Initialize the odometry wheels
-        //driveEncoder = myOpMode.hardwareMap.get(DcMotor.class,"axial");
-        //strafeEncoder = myOpMode.hardwareMap.get(DcMotor.class,"intake");
+        driveEncoder = myOpMode.hardwareMap.get(DcMotor.class,"backRight");
+        strafeEncoder = myOpMode.hardwareMap.get(DcMotor.class,"backLeft");
 
         /*
          * Copied from another source (Simpflied Odometry by gearsincorg)
@@ -164,7 +164,7 @@ public class PIDRobot
 
     public boolean readSensors()
     {
-        /*
+
         rawDriveOdometer = driveEncoder.getCurrentPosition() * (INVERT_DRIVE_ODOMETRY ? -1 : 1);
         rawStrafeOdometer = strafeEncoder.getCurrentPosition() * (INVERT_STRAFE_ODOMETRY ? -1 : 1);
         driveDistance = (rawDriveOdometer - driveOdometerOffset) * ODOM_INCHES_PER_COUNT;
@@ -181,7 +181,7 @@ public class PIDRobot
         myOpMode.telemetry.addData("Strafe Distance :: ",strafeDistance);
         myOpMode.telemetry.addData("Heading :: ",heading);
         myOpMode.telemetry.addData("Turn Rate :: ",turnRate);
-        */
+
         return true;  // do this so this function can be included in the condition for a while loop to keep values fresh.
     }
 
@@ -322,13 +322,15 @@ public class PIDRobot
 
         // If the power + |turn| is above max power, need to scale everything down
 
-        if ((power + Math.abs(turn)) > maxPower)
+        double maxVal = power + Math.abs(turn);
+
+        if (maxVal > maxPower)
         {
             // This set of commands sets the maximum value of any one motor power to 1
-            fL /= (power + turn);
-            fR /= (power + turn);
-            bL /= (power + turn);
-            bR /= (power + turn);
+            fL /= maxVal;
+            fR /= maxVal;
+            bL /= maxVal;
+            bR /= maxVal;
 
             // This set of commands then scales it based on the max power input
             // Typically in autonomous modes this value is less than 1 in case something goes wrong
@@ -366,7 +368,7 @@ public class PIDRobot
         strafeController.reset(0);
     }
 
-    /**
+    /*
      * Reset the robot heading to zero degrees, and also lock that heading into heading controller.
      * Useful when giving new commands based on robot's current positioning instead of where it started
      */
@@ -381,7 +383,8 @@ public class PIDRobot
     public double getTurnRate() {return turnRate;}
 
     /**
-     * Set the drive telemetry on or off
+     * Set the d
+     * \rive telemetry on or off
      */
     public void showTelemetry(boolean show){
         showTelemetry = show;

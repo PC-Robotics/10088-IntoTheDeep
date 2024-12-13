@@ -17,7 +17,7 @@ public class SampleTeleop extends LinearOpMode {
     // Used to keep the robot facing the same direction if bumped
     boolean autoHeading = false;
 
-    PIDRobot robot = new Robot(this);
+    Robot robot = new Robot(this);
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -108,14 +108,21 @@ public class SampleTeleop extends LinearOpMode {
 
         if(autoHeading)
         {
-            turn = robot.yawController.getOutput(robot.getHeading());
+            // turn = robot.yawController.getOutput(robot.getHeading());
         }
         robot.moveRobot(x,y,turn,1);
     }
 
     private void gamepad2Controls() {
         // Nothing to do here
-        if (gamepad2.circle){
+        if (gamepad2.triangle){
+            robot.clawOpen(false);
+        } else if (gamepad2.circle) {
+            robot.clawOpen(true);
+        } else if (gamepad2.dpad_up) {
+            robot.lowerWrist(false);
+        } else if (gamepad2.dpad_down) {
+            robot.lowerWrist(true);
         }
     }
 }
