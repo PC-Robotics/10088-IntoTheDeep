@@ -115,7 +115,7 @@ public class SampleTeleop extends LinearOpMode {
 
     private void gamepad2Controls() {
         // Nothing to do here
-        if (gamepad2.triangle){
+        if (gamepad2.triangle) {
             robot.clawOpen(false);
         } else if (gamepad2.circle) {
             robot.clawOpen(true);
@@ -123,6 +123,12 @@ public class SampleTeleop extends LinearOpMode {
             robot.lowerWrist(false);
         } else if (gamepad2.dpad_down) {
             robot.lowerWrist(true);
+        } else-if(gamepad2.right_stick_x != 0) {
+            robot.rotateWrist(gamepad1.right_stick_x);
+        }
+
+        if(gamepad2.left_stick_y > 0.02 || gamepad2.left_stick_y < -0.02){
+            robot.moveShoulder(gamepad2.left_stick_y);
         }
     }
 }

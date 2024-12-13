@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 public class Robot extends PIDRobot {
     private Servo wristPitch = null;
     private Servo wristYaw = null;
+    private double yawPosition = 0;
     private Servo claw = null;
     private DcMotor linearSlide = null;
     private DcMotor arm = null;
@@ -75,7 +76,24 @@ public class Robot extends PIDRobot {
         }
     }
 
+    public void rotateWrist(double input){
+
+        yawPosition += input*0.01;
+
+        if(yawPosition < 0) {
+            yawPosition = 0;
+        } else-if(yawPosition > 1) {
+            yawPosition = 1;
+        }
+
+        wristYaw.setPosition(yawPosition);
+
+    }
     public void moveLinearSlide(boolean isForwards) {
 
+    }
+
+    public void moveShoulder(double input) {
+        arm.setPower(input);
     }
 }
