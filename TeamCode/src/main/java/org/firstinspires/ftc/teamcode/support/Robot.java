@@ -82,7 +82,7 @@ public class Robot extends PIDRobot {
 
         if(yawPosition < 0) {
             yawPosition = 0;
-        } else-if(yawPosition > 1) {
+        } else if(yawPosition > 1) {
             yawPosition = 1;
         }
 

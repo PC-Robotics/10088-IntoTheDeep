@@ -123,7 +123,7 @@ public class SampleTeleop extends LinearOpMode {
             robot.lowerWrist(false);
         } else if (gamepad2.dpad_down) {
             robot.lowerWrist(true);
-        } else-if(gamepad2.right_stick_x != 0) {
+        } else if(gamepad2.right_stick_x != 0) {
             robot.rotateWrist(gamepad1.right_stick_x);
         }
 
