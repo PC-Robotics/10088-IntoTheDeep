@@ -1,18 +1,19 @@
 package org.firstinspires.ftc.teamcode.support;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
 public class Robot extends PIDRobot {
-    private Servo wristPitch = null;
-    private Servo wristYaw = null;
-    private Servo claw = null;
-    private DcMotor linearSlide = null;
-    private DcMotor arm = null;
-    private DcMotor climbL = null;
-    private DcMotor climbR = null;
+    public Servo wristPitch = null;
+    public Servo wristYaw = null;
+    public Servo claw = null;
+    public DcMotor linearSlide = null;
+    public DcMotor arm = null;
+    public DcMotor climbL = null;
+    public DcMotor climbR = null;
 
     public Robot(LinearOpMode opMode) {
         super(opMode, false);
@@ -35,6 +36,7 @@ public class Robot extends PIDRobot {
         linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         arm = myOpMode.hardwareMap.get(DcMotor.class, "arm");
         arm.setDirection(DcMotor.Direction.FORWARD);
@@ -67,7 +69,9 @@ public class Robot extends PIDRobot {
         }
     }
 
-    public void lowerWrist(boolean down) {
+
+
+    public void moveWristPitch(boolean down) {
         if (down) {
             wristPitch.setPosition(0.125);
         } else {
@@ -75,7 +79,38 @@ public class Robot extends PIDRobot {
         }
     }
 
-    public void moveLinearSlide(boolean isForwards) {
+    private double yawPosition;
 
+    public void moveWristYaw(float input) {
+        yawPosition+= input*0.05;
+
+        if(yawPosition < 0.2) {
+            yawPosition = 0.2;
+        } else if (yawPosition > 0.8) {
+            yawPosition = 0.8;
+        }
+
+        wristYaw.setPosition(yawPosition);
+    }
+
+    public void moveLinearSlide(boolean isForwards, float throttle) {
+        if(isForwards){
+            linearSlide.setDirection(DcMotor.Direction.FORWARD);
+            linearSlide.setPower(throttle);
+        } else {
+            linearSlide.setDirection(DcMotor.Direction.REVERSE);
+            linearSlide.setPower(throttle);
+        }
+    }
+
+    private float armPitch;
+    private int armPitchInt;
+
+    public void moveArm(float input) {
+        armPitch+= input*50 ;
+        armPitchInt = Math.round(armPitch);
+        arm.setTargetPosition(armPitchInt);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.setPower(1);
     }
 }

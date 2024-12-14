@@ -13,6 +13,8 @@ import org.firstinspires.ftc.teamcode.support.Robot;
 public class SampleTeleop extends LinearOpMode {
 
     final double PRECISE_MOVEMENT = 0.2;
+    final double TRIGGER_DEADZONE = 0;
+    final double STICK_DEADZONE = 0;
 
     // Used to keep the robot facing the same direction if bumped
     boolean autoHeading = false;
@@ -39,6 +41,8 @@ public class SampleTeleop extends LinearOpMode {
             gamepad1Controls();
 
             gamepad2Controls();
+
+            telemetry.addData("Linear Slide motor position: ", robot.linearSlide.getCurrentPosition());
 
             telemetry.update();
         }
@@ -114,15 +118,35 @@ public class SampleTeleop extends LinearOpMode {
     }
 
     private void gamepad2Controls() {
-        // Nothing to do here
+        // Claw opening and closing
         if (gamepad2.triangle){
             robot.clawOpen(false);
         } else if (gamepad2.circle) {
             robot.clawOpen(true);
-        } else if (gamepad2.dpad_up) {
-            robot.lowerWrist(false);
+        }
+
+        // Claw moving up and down
+        if (gamepad2.dpad_up) {
+            robot.moveWristPitch(false);
         } else if (gamepad2.dpad_down) {
-            robot.lowerWrist(true);
+            robot.moveWristPitch(true);
+        }
+
+        // Linear slide moving in and out
+        if (gamepad2.left_trigger>TRIGGER_DEADZONE){
+            robot.moveLinearSlide(true, gamepad2.left_trigger);
+        } else if (gamepad2. right_trigger>TRIGGER_DEADZONE) {
+            robot.moveLinearSlide(false, gamepad2.right_trigger);
+        } else {
+            robot.moveLinearSlide(true, 0);
+        }
+
+        // Claw moving left and right
+        if (Math.abs(gamepad2.right_stick_y)>STICK_DEADZONE){
+            robot.moveArm(gamepad2.right_stick_y);
+        }
+        if (Math.abs(gamepad2.left_stick_x)>STICK_DEADZONE){
+            robot.moveWristYaw(-gamepad2.left_stick_x);
         }
     }
 }
