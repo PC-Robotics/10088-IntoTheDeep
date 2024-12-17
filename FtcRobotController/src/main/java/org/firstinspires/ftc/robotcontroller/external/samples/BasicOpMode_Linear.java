@@ -62,6 +62,7 @@ public class BasicOpMode_Linear extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
+        telemetry.addData("hi ", "driver");
         telemetry.update();
 
         // Initialize the hardware variables. Note that the strings used here as parameters
