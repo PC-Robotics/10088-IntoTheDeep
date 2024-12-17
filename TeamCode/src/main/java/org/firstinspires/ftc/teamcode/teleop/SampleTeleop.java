@@ -42,7 +42,8 @@ public class SampleTeleop extends LinearOpMode {
 
             gamepad2Controls();
 
-            telemetry.addData("Linear Slide motor position: ", robot.linearSlide.getCurrentPosition());
+            telemetry.addData("ClimbL current position: ", robot.climbL.getCurrentPosition());
+            telemetry.addData("ClimbR current position: ", robot.climbR.getCurrentPosition());
 
             telemetry.update();
         }
@@ -105,6 +106,14 @@ public class SampleTeleop extends LinearOpMode {
             robot.yawController.reset(-Math.PI / 2);
             autoHeading = true;
         }
+        if (gamepad1.left_trigger>TRIGGER_DEADZONE){
+            robot.climb(false, gamepad1.left_trigger);
+        } else if (gamepad1. right_trigger>TRIGGER_DEADZONE) {
+            robot.climb(true, gamepad1.right_trigger);
+        } else {
+            robot.climb(true, 0);
+        }
+
 
         // Telemetry on desired heading and current heading
         telemetry.addData("Heading :: ",robot.yawController.getSetpoint());
@@ -135,7 +144,7 @@ public class SampleTeleop extends LinearOpMode {
         // Linear slide moving in and out
         if (gamepad2.left_trigger>TRIGGER_DEADZONE){
             robot.moveLinearSlide(true, gamepad2.left_trigger);
-        } else if (gamepad2. right_trigger>TRIGGER_DEADZONE) {
+        } else if (gamepad2.right_trigger>TRIGGER_DEADZONE) {
             robot.moveLinearSlide(false, gamepad2.right_trigger);
         } else {
             robot.moveLinearSlide(true, 0);

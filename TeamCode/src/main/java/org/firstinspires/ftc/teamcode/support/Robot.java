@@ -32,7 +32,7 @@ public class Robot extends PIDRobot {
 
         // define and init motors
         linearSlide = myOpMode.hardwareMap.get(DcMotor.class, "linearSlide");
-        linearSlide.setDirection(DcMotor.Direction.FORWARD);
+        linearSlide.setDirection(DcMotor.Direction.REVERSE);
         linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -45,13 +45,13 @@ public class Robot extends PIDRobot {
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         climbL = myOpMode.hardwareMap.get(DcMotor.class, "climbL");
-        climbL.setDirection(DcMotor.Direction.REVERSE);
+        climbL.setDirection(DcMotor.Direction.FORWARD);
         climbL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         climbL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         climbL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         climbR = myOpMode.hardwareMap.get(DcMotor.class, "climbR");
-        climbR.setDirection(DcMotor.Direction.FORWARD);
+        climbR.setDirection(DcMotor.Direction.REVERSE);
         climbR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         climbR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         climbR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -93,13 +93,13 @@ public class Robot extends PIDRobot {
         wristYaw.setPosition(yawPosition);
     }
 
+    private int slideCurrentPos;
     public void moveLinearSlide(boolean isForwards, float throttle) {
-        if(isForwards){
-            linearSlide.setDirection(DcMotor.Direction.FORWARD);
+        slideCurrentPos = linearSlide.getCurrentPosition();
+        if (slideCurrentPos<5000 && isForwards) {
             linearSlide.setPower(throttle);
-        } else {
-            linearSlide.setDirection(DcMotor.Direction.REVERSE);
-            linearSlide.setPower(throttle);
+        } else if (slideCurrentPos>0) {
+            linearSlide.setPower(-throttle);
         }
     }
 
@@ -107,10 +107,24 @@ public class Robot extends PIDRobot {
     private int armPitchInt;
 
     public void moveArm(float input) {
-        armPitch+= input*50 ;
+        armPitch += input*50 ;
         armPitchInt = Math.round(armPitch);
         arm.setTargetPosition(armPitchInt);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setPower(1);
+    }
+
+    // only raises linear slides and also doesn't stop them
+    private int climbLCurrentPos;
+    private int climbRCurrentPos;
+    public void climb(boolean isForwards, float throttle) {
+        slideCurrentPos = linearSlide.getCurrentPosition();
+        if (climbLCurrentPos<2000 && climbRCurrentPos<2000 && isForwards) {
+            climbL.setPower(throttle);
+            climbR.setPower(throttle);
+        } else if (climbLCurrentPos>0 && climbRCurrentPos<2000) {
+            climbL.setPower(throttle);
+            climbR.setPower(throttle);
+        }
     }
 }
