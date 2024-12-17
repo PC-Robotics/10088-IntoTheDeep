@@ -1,23 +1,25 @@
 package org.firstinspires.ftc.teamcode.support;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-public class Robot extends PIDRobot
-{
-    public Robot(LinearOpMode opMode) {super(opMode, false);}
-
+public class Robot extends PIDRobot {
     public Servo wristPitch = null;
     public Servo wristYaw = null;
     public Servo claw = null;
     public DcMotor linearSlide = null;
     public DcMotor arm = null;
-    public DcMotor climbLeft = null;
-    public DcMotor climbRight = null;
+    public DcMotor climbL = null;
+    public DcMotor climbR = null;
 
-    public void init() {
+    public Robot(LinearOpMode opMode) {
+        super(opMode, false);
+    }
+
+    public void init(boolean showTelemetry) {
         // define and init servos
         wristPitch = myOpMode.hardwareMap.get(Servo.class, "wristPitch");
         wristPitch.setDirection(Servo.Direction.FORWARD);
@@ -35,26 +37,80 @@ public class Robot extends PIDRobot
         linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+
         arm = myOpMode.hardwareMap.get(DcMotor.class, "arm");
         arm.setDirection(DcMotor.Direction.FORWARD);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        climbLeft = myOpMode.hardwareMap.get(DcMotor.class, "climbL");
-        climbLeft.setDirection(DcMotor.Direction.REVERSE);
-        climbLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        climbLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        climbLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        climbL = myOpMode.hardwareMap.get(DcMotor.class, "climbL");
+        climbL.setDirection(DcMotor.Direction.REVERSE);
+        climbL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        climbL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        climbL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        climbRight = myOpMode.hardwareMap.get(DcMotor.class, "climbR");
-        climbRight.setDirection(DcMotor.Direction.FORWARD);
-        climbRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        climbRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        climbRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        climbR = myOpMode.hardwareMap.get(DcMotor.class, "climbR");
+        climbR.setDirection(DcMotor.Direction.FORWARD);
+        climbR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        climbR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        climbR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         myOpMode.telemetry.addData(">", "Hardware Initialized");
 
         super.init(true);
+    }
+
+    public void clawOpen(boolean open) {
+        if (open) {
+            claw.setPosition(0.5);
+        } else {
+            claw.setPosition(0);
+        }
+    }
+
+
+
+    public void moveWristPitch(boolean down) {
+        if (down) {
+            wristPitch.setPosition(0.125);
+        } else {
+            wristPitch.setPosition(0.625);
+        }
+    }
+
+    private double yawPosition;
+
+    public void moveWristYaw(float input) {
+        yawPosition+= input*0.05;
+
+        if(yawPosition < 0.2) {
+            yawPosition = 0.2;
+        } else if (yawPosition > 0.8) {
+            yawPosition = 0.8;
+        }
+
+        wristYaw.setPosition(yawPosition);
+    }
+
+    public void moveLinearSlide(boolean isForwards, float throttle) {
+        if(isForwards){
+            linearSlide.setDirection(DcMotor.Direction.FORWARD);
+            linearSlide.setPower(throttle);
+        } else {
+            linearSlide.setDirection(DcMotor.Direction.REVERSE);
+            linearSlide.setPower(throttle);
+        }
+    }
+
+    private float armPitch;
+    private int armPitchInt;
+
+    public void moveArm(float input) {
+        armPitch+= input*50 ;
+        armPitchInt = Math.round(armPitch);
+        arm.setTargetPosition(armPitchInt);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.setPower(1);
     }
 }
