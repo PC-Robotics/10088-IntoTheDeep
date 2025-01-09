@@ -42,6 +42,7 @@ public class SampleTeleop extends LinearOpMode {
 
             gamepad2Controls();
 
+            telemetry.addData("Linear slide current position: ", robot.linearSlide.getCurrentPosition());
             telemetry.addData("ClimbL current position: ", robot.climbL.getCurrentPosition());
             telemetry.addData("ClimbR current position: ", robot.climbR.getCurrentPosition());
 

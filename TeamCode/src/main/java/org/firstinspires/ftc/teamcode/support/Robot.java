@@ -114,17 +114,18 @@ public class Robot extends PIDRobot {
         arm.setPower(1);
     }
 
-    // only raises linear slides and also doesn't stop them
     private int climbLCurrentPos;
     private int climbRCurrentPos;
     public void climb(boolean isForwards, float throttle) {
-        slideCurrentPos = linearSlide.getCurrentPosition();
+        climbLCurrentPos = climbL.getCurrentPosition();
+        climbRCurrentPos = climbR.getCurrentPosition();
+
         if (climbLCurrentPos<2000 && climbRCurrentPos<2000 && isForwards) {
             climbL.setPower(throttle);
             climbR.setPower(throttle);
         } else if (climbLCurrentPos>0 && climbRCurrentPos<2000) {
-            climbL.setPower(throttle);
-            climbR.setPower(throttle);
+            climbL.setPower(-throttle);
+            climbR.setPower(-throttle);
         }
     }
 }

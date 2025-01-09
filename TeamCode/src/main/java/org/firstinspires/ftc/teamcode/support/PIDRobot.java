@@ -98,7 +98,7 @@ public class PIDRobot
         // Currently running them with encoders to use the PID controls and odometry
         frontRight = setupMotor("frontRight", DcMotor.Direction.REVERSE, false);
         frontLeft = setupMotor("frontLeft",DcMotor.Direction.FORWARD,false);
-        backRight = setupMotor("backRight",DcMotor.Direction.REVERSE, false);
+        backRight = setupMotor("backRight",DcMotor.Direction.FORWARD, false);
         backLeft = setupMotor("backLeft",DcMotor.Direction.FORWARD, false);
 
         // Initialize the IMU
