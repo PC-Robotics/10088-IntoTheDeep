@@ -13,6 +13,8 @@ import org.firstinspires.ftc.teamcode.support.Robot;
 public class SampleTeleop extends LinearOpMode {
 
     final double PRECISE_MOVEMENT = 0.2;
+    final double TRIGGER_DEADZONE = 0;
+    final double STICK_DEADZONE = 0;
 
     // Used to keep the robot facing the same direction if bumped
     boolean autoHeading = false;
@@ -39,6 +41,10 @@ public class SampleTeleop extends LinearOpMode {
             gamepad1Controls();
 
             gamepad2Controls();
+
+            telemetry.addData("Linear slide current position: ", robot.linearSlide.getCurrentPosition());
+            telemetry.addData("ClimbL current position: ", robot.climbL.getCurrentPosition());
+            telemetry.addData("ClimbR current position: ", robot.climbR.getCurrentPosition());
 
             telemetry.update();
         }
@@ -101,6 +107,14 @@ public class SampleTeleop extends LinearOpMode {
             robot.yawController.reset(-Math.PI / 2);
             autoHeading = true;
         }
+        if (gamepad1.left_trigger>TRIGGER_DEADZONE){
+            robot.climb(false, gamepad1.left_trigger);
+        } else if (gamepad1. right_trigger>TRIGGER_DEADZONE) {
+            robot.climb(true, gamepad1.right_trigger);
+        } else {
+            robot.climb(true, 0);
+        }
+
 
         // Telemetry on desired heading and current heading
         telemetry.addData("Heading :: ",robot.yawController.getSetpoint());
@@ -114,21 +128,35 @@ public class SampleTeleop extends LinearOpMode {
     }
 
     private void gamepad2Controls() {
-        // Nothing to do here
-        if (gamepad2.triangle) {
+        // Claw opening and closing
+        if (gamepad2.triangle){
             robot.clawOpen(false);
         } else if (gamepad2.circle) {
             robot.clawOpen(true);
-        } else if (gamepad2.dpad_up) {
-            robot.lowerWrist(false);
-        } else if (gamepad2.dpad_down) {
-            robot.lowerWrist(true);
-        } else if(gamepad2.right_stick_x != 0) {
-            robot.rotateWrist(gamepad1.right_stick_x);
         }
 
-        if(gamepad2.left_stick_y > 0.02 || gamepad2.left_stick_y < -0.02){
-            robot.moveShoulder(gamepad2.left_stick_y);
+        // Claw moving up and down
+        if (gamepad2.dpad_up) {
+            robot.moveWristPitch(false);
+        } else if (gamepad2.dpad_down) {
+            robot.moveWristPitch(true);
+        }
+
+        // Linear slide moving in and out
+        if (gamepad2.left_trigger>TRIGGER_DEADZONE){
+            robot.moveLinearSlide(true, gamepad2.left_trigger);
+        } else if (gamepad2.right_trigger>TRIGGER_DEADZONE) {
+            robot.moveLinearSlide(false, gamepad2.right_trigger);
+        } else {
+            robot.moveLinearSlide(true, 0);
+        }
+
+        // Claw moving left and right
+        if (Math.abs(gamepad2.right_stick_y)>STICK_DEADZONE){
+            robot.moveArm(gamepad2.right_stick_y);
+        }
+        if (Math.abs(gamepad2.left_stick_x)>STICK_DEADZONE){
+            robot.moveWristYaw(-gamepad2.left_stick_x);
         }
     }
 }

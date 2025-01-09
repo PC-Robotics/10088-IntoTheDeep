@@ -1,19 +1,19 @@
 package org.firstinspires.ftc.teamcode.support;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
 public class Robot extends PIDRobot {
-    private Servo wristPitch = null;
-    private Servo wristYaw = null;
-    private double yawPosition = 0;
-    private Servo claw = null;
-    private DcMotor linearSlide = null;
-    private DcMotor arm = null;
-    private DcMotor climbL = null;
-    private DcMotor climbR = null;
+    public Servo wristPitch = null;
+    public Servo wristYaw = null;
+    public Servo claw = null;
+    public DcMotor linearSlide = null;
+    public DcMotor arm = null;
+    public DcMotor climbL = null;
+    public DcMotor climbR = null;
 
     public Robot(LinearOpMode opMode) {
         super(opMode, false);
@@ -32,10 +32,11 @@ public class Robot extends PIDRobot {
 
         // define and init motors
         linearSlide = myOpMode.hardwareMap.get(DcMotor.class, "linearSlide");
-        linearSlide.setDirection(DcMotor.Direction.FORWARD);
+        linearSlide.setDirection(DcMotor.Direction.REVERSE);
         linearSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         linearSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         arm = myOpMode.hardwareMap.get(DcMotor.class, "arm");
         arm.setDirection(DcMotor.Direction.FORWARD);
@@ -44,13 +45,13 @@ public class Robot extends PIDRobot {
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         climbL = myOpMode.hardwareMap.get(DcMotor.class, "climbL");
-        climbL.setDirection(DcMotor.Direction.REVERSE);
+        climbL.setDirection(DcMotor.Direction.FORWARD);
         climbL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         climbL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         climbL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         climbR = myOpMode.hardwareMap.get(DcMotor.class, "climbR");
-        climbR.setDirection(DcMotor.Direction.FORWARD);
+        climbR.setDirection(DcMotor.Direction.REVERSE);
         climbR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         climbR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         climbR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -68,7 +69,9 @@ public class Robot extends PIDRobot {
         }
     }
 
-    public void lowerWrist(boolean down) {
+
+
+    public void moveWristPitch(boolean down) {
         if (down) {
             wristPitch.setPosition(0.125);
         } else {
@@ -76,24 +79,53 @@ public class Robot extends PIDRobot {
         }
     }
 
-    public void rotateWrist(double input){
+    private double yawPosition;
 
-        yawPosition += input*0.01;
+    public void moveWristYaw(float input) {
+        yawPosition+= input*0.05;
 
-        if(yawPosition < 0) {
-            yawPosition = 0;
-        } else if(yawPosition > 1) {
-            yawPosition = 1;
+        if(yawPosition < 0.2) {
+            yawPosition = 0.2;
+        } else if (yawPosition > 0.8) {
+            yawPosition = 0.8;
         }
 
         wristYaw.setPosition(yawPosition);
-
-    }
-    public void moveLinearSlide(boolean isForwards) {
-
     }
 
-    public void moveShoulder(double input) {
-        arm.setPower(input);
+    private int slideCurrentPos;
+    public void moveLinearSlide(boolean isForwards, float throttle) {
+        slideCurrentPos = linearSlide.getCurrentPosition();
+        if (slideCurrentPos<5000 && isForwards) {
+            linearSlide.setPower(throttle);
+        } else if (slideCurrentPos>0) {
+            linearSlide.setPower(-throttle);
+        }
+    }
+
+    private float armPitch;
+    private int armPitchInt;
+
+    public void moveArm(float input) {
+        armPitch += input*50 ;
+        armPitchInt = Math.round(armPitch);
+        arm.setTargetPosition(armPitchInt);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm.setPower(1);
+    }
+
+    private int climbLCurrentPos;
+    private int climbRCurrentPos;
+    public void climb(boolean isForwards, float throttle) {
+        climbLCurrentPos = climbL.getCurrentPosition();
+        climbRCurrentPos = climbR.getCurrentPosition();
+
+        if (climbLCurrentPos<2000 && climbRCurrentPos<2000 && isForwards) {
+            climbL.setPower(throttle);
+            climbR.setPower(throttle);
+        } else if (climbLCurrentPos>0 && climbRCurrentPos<2000) {
+            climbL.setPower(-throttle);
+            climbR.setPower(-throttle);
+        }
     }
 }
