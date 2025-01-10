@@ -120,12 +120,18 @@ public class Robot extends PIDRobot {
         climbLCurrentPos = climbL.getCurrentPosition();
         climbRCurrentPos = climbR.getCurrentPosition();
 
-        if (climbLCurrentPos<2000 && climbRCurrentPos<2000 && isForwards) {
+
+
+        if (climbLCurrentPos<8000 && climbRCurrentPos< 8000 && isForwards) {
             climbL.setPower(throttle);
             climbR.setPower(throttle);
-        } else if (climbLCurrentPos>0 && climbRCurrentPos<2000) {
+        } else if (climbLCurrentPos>0 && climbRCurrentPos>0 && !isForwards) {
             climbL.setPower(-throttle);
             climbR.setPower(-throttle);
+        }
+        else {
+            climbL.setPower(0);
+            climbR.setPower(0);
         }
     }
 }
