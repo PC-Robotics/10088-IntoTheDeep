@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.support;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -15,9 +14,7 @@ public class Robot extends PIDRobot {
     public DcMotor climbL = null;
     public DcMotor climbR = null;
 
-    public Robot(LinearOpMode opMode) {
-        super(opMode, false);
-    }
+    public Robot(LinearOpMode opMode, boolean isFieldCentric) {super(opMode, isFieldCentric);}
 
     public void init(boolean showTelemetry) {
         // define and init servos
@@ -63,14 +60,14 @@ public class Robot extends PIDRobot {
 
     public void clawOpen(boolean open) {
         if (open) {
-            claw.setPosition(0.5);
+            claw.setPosition(0.4);
         } else {
             claw.setPosition(0);
         }
     }
 
 
-
+    /*
     public void moveWristPitch(boolean down) {
         if (down) {
             wristPitch.setPosition(0.125);
@@ -78,56 +75,67 @@ public class Robot extends PIDRobot {
             wristPitch.setPosition(0.625);
         }
     }
+    */
 
-    private double yawPosition;
+    private double pitchPosition;
 
-    public void moveWristYaw(float input) {
-        yawPosition+= input*0.05;
+    public void moveWristPitch(float input) {
+        pitchPosition+= input*0.03;
 
-        if(yawPosition < 0.2) {
-            yawPosition = 0.2;
-        } else if (yawPosition > 0.8) {
-            yawPosition = 0.8;
+        if(pitchPosition < 0.2) {
+            pitchPosition = 0.2;
+        } else if (pitchPosition > 0.8) {
+            pitchPosition = 0.8;
         }
 
-        wristYaw.setPosition(yawPosition);
+        wristPitch.setPosition(pitchPosition);
     }
 
     private int slideCurrentPos;
-    public void moveLinearSlide(boolean isForwards, float throttle) {
+    public void moveLinearSlide(double throttle) {
         slideCurrentPos = linearSlide.getCurrentPosition();
-        if (slideCurrentPos<5000 && isForwards) {
+        if (slideCurrentPos<5400 && throttle>0) {
             linearSlide.setPower(throttle);
-        } else if (slideCurrentPos>0) {
-            linearSlide.setPower(-throttle);
+        } else if (slideCurrentPos>100 && throttle<0) {
+            linearSlide.setPower(throttle);
+        } else {
+            linearSlide.setPower(0);
         }
     }
 
-    private float armPitch;
-    private int armPitchInt;
+    public int armTargetPitch;
+    private double armCurrentPitch;
+    private boolean targetPitchAcceptable=true;
 
     public void moveArm(float input) {
-        armPitch += input*50 ;
-        armPitchInt = Math.round(armPitch);
-        arm.setTargetPosition(armPitchInt);
+        if (targetPitchAcceptable) {
+            armTargetPitch += Math.round(input * 30);
+        } else if (armTargetPitch>6000) {
+            armTargetPitch = 6000;
+        } else {
+            armTargetPitch = 0;
+        }
+        armCurrentPitch = arm.getCurrentPosition();
+        targetPitchAcceptable = armTargetPitch>=0 && armTargetPitch<=6000;
+
+        if ((armCurrentPitch>0 && targetPitchAcceptable)||(armCurrentPitch<6000 && targetPitchAcceptable)) {
+            arm.setTargetPosition(armTargetPitch);
+        }
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setPower(1);
     }
 
     private int climbLCurrentPos;
     private int climbRCurrentPos;
-    public void climb(boolean isForwards, float throttle) {
+    public void climb(double throttle) {
         climbLCurrentPos = climbL.getCurrentPosition();
         climbRCurrentPos = climbR.getCurrentPosition();
-
-
-
-        if (climbLCurrentPos<8000 && climbRCurrentPos< 8000 && isForwards) {
+        if (climbLCurrentPos<8000 && climbRCurrentPos< 8000 && throttle>0) {
             climbL.setPower(throttle);
             climbR.setPower(throttle);
-        } else if (climbLCurrentPos>0 && climbRCurrentPos>0 && !isForwards) {
-            climbL.setPower(-throttle);
-            climbR.setPower(-throttle);
+        } else if (climbLCurrentPos>0 && climbRCurrentPos>50 && throttle<0) {
+            climbL.setPower(throttle);
+            climbR.setPower(throttle);
         }
         else {
             climbL.setPower(0);
