@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.support;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -38,7 +39,7 @@ public class Robot extends PIDRobot {
         arm = myOpMode.hardwareMap.get(DcMotor.class, "arm");
         arm.setDirection(DcMotor.Direction.FORWARD);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         climbL = myOpMode.hardwareMap.get(DcMotor.class, "climbL");
@@ -66,19 +67,7 @@ public class Robot extends PIDRobot {
         }
     }
 
-
-    /*
-    public void moveWristPitch(boolean down) {
-        if (down) {
-            wristPitch.setPosition(0.125);
-        } else {
-            wristPitch.setPosition(0.625);
-        }
-    }
-    */
-
     private double pitchPosition;
-
     public void moveWristPitch(float input) {
         pitchPosition+= input*0.03;
 
@@ -94,22 +83,20 @@ public class Robot extends PIDRobot {
     private int slideCurrentPos;
     public void moveLinearSlide(double throttle) {
         slideCurrentPos = linearSlide.getCurrentPosition();
-        if (slideCurrentPos<5400 && throttle>0) {
-            linearSlide.setPower(throttle);
-        } else if (slideCurrentPos>100 && throttle<0) {
+        if ((slideCurrentPos<5700 && throttle>0)||(slideCurrentPos>100 && throttle<0)) {
             linearSlide.setPower(throttle);
         } else {
             linearSlide.setPower(0);
         }
     }
 
-    public int armTargetPitch;
+    public int armTargetPitch = 0;
     private double armCurrentPitch;
     private boolean targetPitchAcceptable=true;
 
     public void moveArm(float input) {
         if (targetPitchAcceptable) {
-            armTargetPitch += Math.round(input * 30);
+            armTargetPitch += Math.round(input * 50);
         } else if (armTargetPitch>6000) {
             armTargetPitch = 6000;
         } else {

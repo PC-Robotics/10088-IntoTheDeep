@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.support.Robot;
 
 public class SampleTeleop extends LinearOpMode {
 
-    final double PRECISE_MOVEMENT = 0.2;
+    final double PRECISE_MOVEMENT = 0.5;
     final double TRIGGER_DEADZONE = 0.05;
     final double STICK_DEADZONE = 0;
 
@@ -111,10 +111,10 @@ public class SampleTeleop extends LinearOpMode {
             robot.yawController.reset(-Math.PI / 2);
             autoHeading = true;
         }
-        if (gamepad1.left_trigger>TRIGGER_DEADZONE){
-            robot.climb(gamepad1.left_trigger);
-        } else if (gamepad1.right_trigger>TRIGGER_DEADZONE) {
-            robot.climb(-gamepad1.right_trigger);
+        if (gamepad1.right_trigger>TRIGGER_DEADZONE){
+            robot.climb(gamepad1.right_trigger);
+        } else if (gamepad1.left_trigger>TRIGGER_DEADZONE) {
+            robot.climb(-gamepad1.left_trigger);
         } else {
             robot.climb(0);
         }
@@ -140,10 +140,10 @@ public class SampleTeleop extends LinearOpMode {
         }
 
         // Linear slide moving in and out
-        if (gamepad2.left_trigger>TRIGGER_DEADZONE){
-            robot.moveLinearSlide(gamepad2.left_trigger);
-        } else if (gamepad2.right_trigger>TRIGGER_DEADZONE) {
-            robot.moveLinearSlide(-gamepad2.right_trigger);
+        if (gamepad2.right_trigger>TRIGGER_DEADZONE){
+            robot.moveLinearSlide(gamepad2.right_trigger);
+        } else if (gamepad2.left_trigger>TRIGGER_DEADZONE) {
+            robot.moveLinearSlide(-gamepad2.left_trigger);
         } else {
             robot.moveLinearSlide(0);
         }
@@ -151,6 +151,8 @@ public class SampleTeleop extends LinearOpMode {
         // Arm moving up and down
         if (Math.abs(gamepad2.left_stick_y)>STICK_DEADZONE){
             robot.moveArm(-gamepad2.left_stick_y);
+        } else {
+            robot.arm.setPower(0.05);
         }
 
         // Claw moving up and down
