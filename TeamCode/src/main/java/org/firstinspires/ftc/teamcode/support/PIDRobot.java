@@ -389,4 +389,11 @@ public class PIDRobot
     public void showTelemetry(boolean show){
         showTelemetry = show;
     }
+
+    public void moveMotors(double frontLeftPower, double frontRightPower, double backLeftPower, double backRightPower) {
+        frontLeft.setPower(frontLeftPower);
+        frontRight.setPower(frontRightPower);
+        backLeft.setPower(backLeftPower);
+        backRight.setPower(backRightPower);
+    }
 }

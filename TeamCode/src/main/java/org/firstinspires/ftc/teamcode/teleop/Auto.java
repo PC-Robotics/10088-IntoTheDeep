@@ -13,10 +13,9 @@ public class Auto extends LinearOpMode {
     public void runOpMode() {
         robot.init(false);
         waitForStart();
-        robot.strafe(-42, 0.5, 4);
-        //Forwards and hang preload specimen
-       // robot.drive(24, 0.5, 1);
-        //robot.arm.setTargetPosition();
+        robot.moveMotors(1, -1, -1, 1);
+        sleep(2000);
+        robot.moveMotors(0,0,0,0);
 
     }
 }
