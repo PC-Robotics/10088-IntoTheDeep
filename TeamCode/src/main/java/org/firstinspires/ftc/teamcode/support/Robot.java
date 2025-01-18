@@ -72,10 +72,10 @@ public class Robot extends PIDRobot {
     public void moveWristPitch(float input) {
         pitchPosition+= input*0.03;
 
-        if(pitchPosition < 0.2) {
-            pitchPosition = 0.2;
-        } else if (pitchPosition > 0.8) {
-            pitchPosition = 0.8;
+        if(pitchPosition < 0.04) {
+            pitchPosition = 0.04;
+        } else if (pitchPosition > 0.16) {
+            pitchPosition = 0.16;
         }
 
         wristPitch.setPosition(pitchPosition);
