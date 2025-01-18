@@ -12,14 +12,14 @@ import org.firstinspires.ftc.teamcode.support.Robot;
 
 public class SampleTeleop extends LinearOpMode {
 
-    final double PRECISE_MOVEMENT = 0.2;
-    final double TRIGGER_DEADZONE = 0;
+    final double PRECISE_MOVEMENT = 0.5;
+    final double TRIGGER_DEADZONE = 0.05;
     final double STICK_DEADZONE = 0;
 
     // Used to keep the robot facing the same direction if bumped
     boolean autoHeading = false;
 
-    Robot robot = new Robot(this);
+    Robot robot = new Robot(this, true);
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -30,6 +30,7 @@ public class SampleTeleop extends LinearOpMode {
         while(opModeInInit())
         {
             telemetry.addData(">", "Touch Play to Start");
+            telemetry.addLine("Don't break anything please");
             robot.readSensors();
             telemetry.update();
         }
@@ -42,7 +43,12 @@ public class SampleTeleop extends LinearOpMode {
 
             gamepad2Controls();
 
-            telemetry.addData("Linear Slide motor position: ", robot.linearSlide.getCurrentPosition());
+            telemetry.addData("Linear slide current position: ", robot.linearSlide.getCurrentPosition());
+            telemetry.addData("ClimbL current position: ", robot.climbL.getCurrentPosition());
+            telemetry.addData("ClimbR current position: ", robot.climbR.getCurrentPosition());
+            telemetry.addData("Arm current position: ", robot.arm.getCurrentPosition());
+            telemetry.addLine();
+            telemetry.addLine("Kai was here");
 
             telemetry.update();
         }
@@ -105,6 +111,14 @@ public class SampleTeleop extends LinearOpMode {
             robot.yawController.reset(-Math.PI / 2);
             autoHeading = true;
         }
+        if (gamepad1.right_trigger>TRIGGER_DEADZONE){
+            robot.climb(gamepad1.right_trigger);
+        } else if (gamepad1.left_trigger>TRIGGER_DEADZONE) {
+            robot.climb(-gamepad1.left_trigger);
+        } else {
+            robot.climb(0);
+        }
+
 
         // Telemetry on desired heading and current heading
         telemetry.addData("Heading :: ",robot.yawController.getSetpoint());
@@ -125,28 +139,25 @@ public class SampleTeleop extends LinearOpMode {
             robot.clawOpen(true);
         }
 
-        // Claw moving up and down
-        if (gamepad2.dpad_up) {
-            robot.moveWristPitch(false);
-        } else if (gamepad2.dpad_down) {
-            robot.moveWristPitch(true);
-        }
-
         // Linear slide moving in and out
-        if (gamepad2.left_trigger>TRIGGER_DEADZONE){
-            robot.moveLinearSlide(true, gamepad2.left_trigger);
-        } else if (gamepad2. right_trigger>TRIGGER_DEADZONE) {
-            robot.moveLinearSlide(false, gamepad2.right_trigger);
+        if (gamepad2.right_trigger>TRIGGER_DEADZONE){
+            robot.moveLinearSlide(gamepad2.right_trigger);
+        } else if (gamepad2.left_trigger>TRIGGER_DEADZONE) {
+            robot.moveLinearSlide(-gamepad2.left_trigger);
         } else {
-            robot.moveLinearSlide(true, 0);
+            robot.moveLinearSlide(0);
         }
 
-        // Claw moving left and right
-        if (Math.abs(gamepad2.right_stick_y)>STICK_DEADZONE){
-            robot.moveArm(gamepad2.right_stick_y);
+        // Arm moving up and down
+        if (Math.abs(gamepad2.left_stick_y)>STICK_DEADZONE){
+            robot.moveArm(-gamepad2.left_stick_y);
+        } else {
+            robot.arm.setPower(0.05);
         }
-        if (Math.abs(gamepad2.left_stick_x)>STICK_DEADZONE){
-            robot.moveWristYaw(-gamepad2.left_stick_x);
+
+        // Claw moving up and down
+        if (Math.abs(gamepad2.right_stick_y)>STICK_DEADZONE){
+            robot.moveWristPitch(gamepad2.right_stick_y);
         }
     }
 }
