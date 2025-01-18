@@ -70,7 +70,7 @@ public class Robot extends PIDRobot {
 
     private double pitchPosition;
     public void moveWristPitch(float input) {
-        pitchPosition+= input*0.015;
+        pitchPosition+= input*0.0075;
 
         if(pitchPosition < 0.2) {
             pitchPosition = 0.2;
