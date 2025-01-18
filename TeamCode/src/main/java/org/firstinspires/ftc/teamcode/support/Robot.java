@@ -39,6 +39,7 @@ public class Robot extends PIDRobot {
         arm = myOpMode.hardwareMap.get(DcMotor.class, "arm");
         arm.setDirection(DcMotor.Direction.FORWARD);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setTargetPosition(0);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 

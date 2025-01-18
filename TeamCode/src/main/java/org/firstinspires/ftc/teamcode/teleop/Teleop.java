@@ -5,12 +5,11 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.support.PIDRobot;
 import org.firstinspires.ftc.teamcode.support.Robot;
 
-@TeleOp(name="SampleTeleop", group=" Sample")
+@TeleOp(name="Teleop", group=" Sample")
 
-public class SampleTeleop extends LinearOpMode {
+public class Teleop extends LinearOpMode {
 
     final double PRECISE_MOVEMENT = 0.5;
     final double TRIGGER_DEADZONE = 0.05;
@@ -19,7 +18,7 @@ public class SampleTeleop extends LinearOpMode {
     // Used to keep the robot facing the same direction if bumped
     boolean autoHeading = false;
 
-    Robot robot = new Robot(this, true);
+    Robot robot = new Robot(this, false);
 
     @Override
     public void runOpMode() throws InterruptedException
